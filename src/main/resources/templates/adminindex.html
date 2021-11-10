@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<title>主页</title>
+		<link href="/static/style/common02.css" rel="stylesheet" />
+	</head>
+<frameset rows="150,*,60" cols="*" framespacing="0" frameborder="no">
+	<frame src="top.html" scrolling="no" noresize="noresize" id="topFrame" marginwidth="0" marginheight="0" frameborder="0"/>
+	<!-- scrolling="no"不显示滚动条  noresize="noresize"不能随意拖动大小 frameborder窗口边框 marginwidth外填充宽度
+	marginheight外填充高度-->
+	<frameset cols="100,260,1050,*" >
+		<frame src="03.html">
+		<frame src="adminleft.html" target="main" name="leftFrame" noresize="noresize" marginwidth="110px" marginheight="0" frameborder="0" scrolling="auto">
+		<!-- scrolling="auto" 当该窗口链接的网页的内容超出设定的大小 -->
+		<frame src="01.html" target="_self" name="main" marginheight="40px" marginwidth="50px" frameborder="0" scrolling="auto" >
+		<frame src="03.html"/>
+	</frameset>
+	<frame src="02.html" name="bottomFrame" scrolling="no" noresize="noresize" id="bottomFrame" marginheight="0"/>
+</frameset>
+</html>

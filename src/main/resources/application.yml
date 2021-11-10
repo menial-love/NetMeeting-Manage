@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    driver-class-name:  com.mysql.cj.jdbc.Driver
+    url:  jdbc:mysql://127.0.0.1:3306/meeting?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8
+    username:  root
+    password:  159753
+  mvc:
+    view:
+      prefix: /
+      suffix: .jsp
+  thymeleaf:             # html文件存放
+    cache: false
+    prefix: classpath:/templates/    # classpath是resource的路径，访问页面文件前缀路径
+    suffix: .html       # 文件后缀
+    mode: HTML
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+
+server:
+  port: 80                           # tomcat服务端口号
+mybatis:
+  mapper-locations: classpath*:mapping/*.xml     # mybatis xml mapper文件存放路径
+
+

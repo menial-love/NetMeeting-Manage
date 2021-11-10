@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/static/style/common03.css"/>
+		<script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+	</head>
+	<body>
+		<div class="page-content">
+			<div class="content-nav">会议预定>查看会议室</div>
+			<table class="listtable">
+				<tr class="listheader">
+					<th>门牌编号</th>
+					<th>会议室名称</th>
+					<th>容纳人数</th>
+					<th>当前状态</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+		<div class="pptv_pages" id="pages_box">
+			<span id="text1"></span>
+			<span id="text2"></span>
+			<span><a href="javascript:void(0);" class="prev">上一页</a></span>
+			<span><a href="javascript:void(0);" class="next">下一页</a></span>
+		</div>
+		<script>
+			var CurrentPage = 1;
+			var TotalNum = 0;
+			var TotalPage = 0;
+
+			// 上一页
+			$(".prev").click(function (){
+				if(CurrentPage > 1) {
+					CurrentPage = CurrentPage - 1;
+					// 发送ajax请求查询数据
+					$.ajax({
+						cache: false,
+						type: 'POST',
+						url: "/showmeetingrooms/" + CurrentPage,
+						async: true,
+						success:function (data) {
+							$(".listtable  tr:not(:first)").html("");   // 首先将表格内容全部清除
+							var s = "";
+							var status = "";
+							for(var i = 0; i < data.table.rooms.length; i++) {
+								if(data.table.rooms[i].roomStatus === 0){
+									status = "启用";
+								} else if(data.table.rooms[i].roomStatus === 1) {
+									status = "禁用";
+								}
+								s = "<tr><td>" + data.table.rooms[i].roomCode + "</td><td>" + data.table.rooms[i].roomName + "</td><td>" +
+										data.table.rooms[i].roomCapacity + "</td><td>" + status + "</td><td>" +
+										"<a class=\"clickbutton\" href=\"roomdetails.html\">查看详情</a>" + "</td></tr>";
+								$(".listtable").append(s);
+							}
+							$("#text2").text("");
+							var t2 = "第" + CurrentPage + "/" + TotalPage + "页";
+							$("#text2").text(t2);
+						}
+					})
+				} else {
+					// 如果已经是第一页则不会有任何改变
+					return false;
+				}
+			});
+
+			// 下一页
+			$(".next").click(function () {
+				if(CurrentPage === TotalPage) {
+					// 如果当前已经是最后一页则不会有任何改变
+					return false;
+				}else {
+					CurrentPage = CurrentPage + 1;
+					// 发送ajax请求查询数据
+					$.ajax({
+						cache: false,
+						type: 'POST',
+						url: "/showmeetingrooms/" + CurrentPage,
+						async: true,
+						success:function (data) {
+							$(".listtable  tr:not(:first)").html("");   // 首先将表格除标题内容全部清除
+							// 显示新的内容
+							var s = "";
+							var status = "";
+							for(var i = 0; i < data.table.rooms.length; i++) {
+								if(data.table.rooms[i].roomStatus === 0){
+									status = "启用";
+								} else if(data.table.rooms[i].roomStatus === 1) {
+									status = "禁用";
+								}
+								s = "<tr><td>" + data.table.rooms[i].roomCode + "</td><td>" + data.table.rooms[i].roomName + "</td><td>" +
+										data.table.rooms[i].roomCapacity + "</td><td>" + status + "</td><td>" +
+										"<a class=\"clickbutton\" href=\"roomdetails.html\">查看详情</a>" + "</td></tr>";
+								$(".listtable").append(s);
+							}
+							$("#text2").text("");
+							var t2 = "第" + CurrentPage + "/" + TotalPage + "页";
+							$("#text2").text(t2);
+						}
+					})
+				}
+			});
+
+			// 页面初次加载第一页数据
+			$(document).ready(function (){
+				$.ajax({
+					cache: false,
+					type: 'POST',
+					url: '/showmeetingrooms/1',
+					async: true,
+					success: function (data) {
+						var s = "";
+						var status = "";
+						for(var i = 0; i < data.table.rooms.length; i++) {
+							if(data.table.rooms[i].roomStatus === 0){
+								status = "启用";
+							} else if(data.table.rooms[i].roomStatus === 1) {
+								status = "禁用";
+							}
+							s = "<tr><td>" + data.table.rooms[i].roomCode + "</td><td>" + data.table.rooms[i].roomName + "</td><td>" +
+									data.table.rooms[i].roomCapacity + "</td><td>" + status + "</td><td>" +
+									"<a class=\"clickbutton\" href=\"roomdetails.html\">查看详情</a>" + "</td></tr>";
+							$(".listtable").append(s);
+						}
+						TotalNum = data.table.totalNum;
+						TotalPage = data.table.totalPage;
+						var t1 = "共" + TotalNum + "条";
+						$("#text1").text(t1);
+						var t2 = "第1/" + TotalPage + "页";
+						$("#text2").text(t2);
+					}
+				});
+			});
+
+		</script>
+	</body>
+</html>

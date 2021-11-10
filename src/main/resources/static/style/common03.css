@@ -1,0 +1,141 @@
+*{
+	font-size: 14px;
+}
+body{
+	padding: 0;
+	margin: 0;
+	width: 150px;
+	background-color:#FAFBFC ;
+}
+a{
+	color: gray;
+	text-decoration: none;
+	/* 取消下划线 */
+}
+/* 伪类 */
+a:hover{/*鼠标悬停时*/
+	color: red;
+	font-weight: bold;
+	text-decoration: none;
+}
+a:visited{/*访问过的超链接标签*/
+	text-decoration: none;
+}
+
+.page-content{
+	width: 850px;
+	text-align: left;
+	margin-left:50px ;
+}
+.page-content .content-nav{
+	padding: 0 0 10px 0;
+}
+
+.listtable{
+	width: 100%;
+	border: 1px solid #AFAFAF;
+	border-collapse: collapse;
+	/* 将边框重合 */
+	margin-bottom: 10px;
+}
+
+.listtable caption{
+	text-align: left;
+	font-size: 16px;
+	padding: 2px;
+	font-weight: bold;
+}
+.listtable td{
+	padding: 5px;
+	border: 1px solid gray;
+	font-size: 12px;
+	text-align: center;
+}
+.listtable tr:nth-child(2n){
+	/* 选择表格中所有偶数项的tr */
+	background-color: #ebeaea;
+}
+	
+.listtable .listheader{
+	background-color: #1E90FF;
+	text-align: center;
+}
+
+.listtable .listheader th{
+	padding: 5px;
+	border: 1px solid gray;
+}
+
+.clickbutton{
+	border: 1px solid #4D4D4D;
+	padding: 2px 10px;
+	cursor: pointer;
+	font-size: 14px;
+}
+#empName,#empAccount,#empPassword,#confirm,#empTel,#empEmail,#empRemark,#roomNumber,#roomName,#roomCapacity,#capacity,#roomcapacity{
+	width: 255px;
+	height: 28px;
+	border: 1px solid #A6A6A6 ;
+	/*设置边框圆角*/
+	border-radius: 5px;
+}
+table{
+      border-collapse: separate;
+      border-spacing:10px;
+}
+h3{
+	text-align: center;
+}
+.header-info{
+	float: left;
+}
+.info-number{
+	font-weight: bold;
+}
+.header-nav{
+	float: right;
+}
+.nav-number{
+	width: 30px;
+	margin: 0 5px;
+}
+
+#divform {
+float: left;
+width: 150px;
+}
+
+#divto {
+float: left;
+width: 150px;
+}
+
+#divoperator {
+	float: left;
+	width: 50px;
+	padding: 60px 5px;
+}
+
+#divoperator input[type="button"] {
+	margin: 10px 0;
+}
+#selEmployees {
+	display: block;
+	/* 是元素变为块级元素 */
+	width: 100%;
+	height: 200px;
+}
+#selDepartments {
+	display: block;
+	width: 100%;
+}
+#selSelectedEmployees {
+	display: block;
+	width: 100%;
+	height: 225px;
+}
+
+.pptv_pages {
+	width: 500px;
+	margin-left: 350px;
+}

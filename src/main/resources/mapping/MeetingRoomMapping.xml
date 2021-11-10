@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.meeting.netmeeting.mapper.MeetingRoomMapper">
+    <resultMap id="BaseResultMap" type="com.meeting.netmeeting.entity.MeetingRoom">
+        <id column="RoomId" property="roomId" jdbcType="INTEGER" />
+        <!--column映射数据库表名  property映射实体类中变量成员名-->
+        <result column="RoomCode" property="roomCode" jdbcType="VARCHAR" />
+        <result column="RoomName" property="roomName" jdbcType="VARCHAR" />
+        <result column="RoomCapacity" property="roomCapacity" jdbcType="INTEGER" />
+        <result column="RoomStatus" property="roomStatus" jdbcType="INTEGER" />
+        <result column="Description" property="description" jdbcType="VARCHAR" />
+    </resultMap>
+    <!--数据库列名-->
+    <sql id="Base_Column_List" >
+        RoomId, RoomCode, RoomName,RoomCapacity, RoomStatus, Description
+    </sql>
+    <insert id="insert" parameterType="com.meeting.netmeeting.entity.MeetingRoom">
+        insert into meetingroom (RoomCode, RoomName
+                                , RoomCapacity, RoomStatus, Description
+        )
+        values (#{roomCode,jdbcType=VARCHAR}, #{roomName,jdbcType=VARCHAR},
+                #{roomCapacity,jdbcType=INTEGER},
+                #{roomStatus,jdbcType=INTEGER}, #{description,jdbcType=VARCHAR})
+    </insert>
+    <select id="selectAll" resultType="com.meeting.netmeeting.entity.MeetingRoom">
+        select *
+        from meetingroom
+        order by RoomId
+    </select>
+    <select id="SelectNameById" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select RoomId
+        from meetingroom
+        where RoomName = #{dName}
+    </select>
+
+</mapper>

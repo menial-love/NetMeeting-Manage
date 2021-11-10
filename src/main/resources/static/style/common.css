@@ -1,0 +1,150 @@
+*{
+	padding: 0;
+	margin: 0;
+	font-size: 18px;
+}
+/* *代表所有 */
+.page-content{
+	width: 850px;
+	
+}
+
+body{
+	background-color: aliceblue;
+	width: 1000px;
+	margin: 30px auto;
+	/* 元素的外填充 属性一个值，决定元素四周的外填充
+		属性两个值 决定的是上下 左右
+		属性四个值 决定上右下左顺时针
+		auto是自动把外填充平分*/
+}
+.content-nav{
+	padding: 0 0 10px 0;
+	/* 内填充，元素内容到元素边框的填充 */
+}
+
+.page-content .content-nav{
+	padding: 0 0 10px 0;
+}
+
+.clickbutton{
+	border: 1px solid #4D4D4D;
+	/* 边框粗细 边框线的类型 边框线的颜色 */
+	/* 颜色的表示方法
+	1. 英文单词直接表示 red green blue
+	2.rgb是光的三原色red green blue 每一种颜色的数字的范围是0~255 
+	数字越大，颜色的占比越重 越白 纯白色rgb(255,255,255) 纯黑rgb(0,0,0)
+	3.十六位进制表示 #和6位16进制的数字表示颜色，每两位表示一种原色 纯黑色#000000
+	可以简写为#000 当两位的数字一致可以简写为一个 #FFF纯白色
+	4.rgba(0,0,0,0.0) 前三位与rgb一致，最后一位是alpha 透明度 
+	范围是0~1的小数，数字越大，原色越实诚*/
+	padding: 2px 10px;
+	cursor: pointer;
+	/* 当鼠标处于该元素上方时，指针改为手指 */
+	font-size: 14px;
+	
+}
+
+fieldset{
+	padding: 30px;
+	width: 50%;
+	background-color: white;
+	margin-left: 0px;
+	margin-top: 150px;
+}
+
+
+legend{
+	font-size: 24px;
+	font-weight: bold;
+	/* 文字加粗 */
+}
+
+.formtable{
+	width: 100%;
+	/* 针对于父标签 找到最后一个被设置大小的父级标签*/
+}
+.formtable td{
+	padding: 10px;
+}
+
+.formtable tr td:first-child{
+	display:table-cell;
+	 vertical-align:middle;
+}
+
+.formtable .command{
+	text-align: center;
+	/* 内容水平居中 */
+}
+
+
+.left-pwd{
+	float: left;
+}
+
+.right-reg{
+	float: right;
+}
+
+#accountname,#password{
+	width: 255px;
+	height: 36px;
+	border: 1px solid #A6A6A6 ;
+	/*设置边框圆角*/
+	border-radius: 5px;
+}
+
+input[type="submit"]{
+	text-align:center;
+	vertical-align:middle;
+	width: 230px;
+	height: 36px;
+	font-size: 20px;
+	background-color: dodgerblue;
+	color: white;
+	margin: 2px 10px;
+}
+.page-header{
+	position: relative;
+		height: 60px;
+		background-color: #FAFBFC;
+		border-radius: 10px;
+		margin-bottom: 10px;
+		padding:10px;
+		
+}
+.header-title{
+	float: left;
+	width: 60%;
+	text-align: center;
+	font-size: 28px;
+	padding-top: 5px;
+}
+.header-quicklink{
+	font-size: 14px;
+	width: 200px;
+	float: right;
+	margin-top: 13px;
+}
+#
+a{
+	color: gray;
+	text-decoration: none;
+	/* 取消下划线 */
+}
+/* 伪类 */
+a:hover{
+	color: #1E90FF;
+	font-weight: bold;
+	text-decoration: none;
+}
+a:visited{
+	text-decoration: none;
+} 
+.header-quicklink strong{
+	font-size: 12px;
+}
+.header-quicklink a{
+	font-size: 12px;
+}

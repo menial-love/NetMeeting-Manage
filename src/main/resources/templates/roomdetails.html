@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="style/common03.css" />
+	</head>
+	<body>
+		<div class="page-content">
+			<div class="content-nav">会议预定>修改会议室信息</div>
+			<form>
+				<fieldset>
+					<legend>会议室信息</legend>
+					<table class="formtable">
+						<tr>
+							<td>门牌号：</td>
+							<td>
+								<input id="roomNumber" type="text" value="201" maxlength="10"/>
+							</td>
+						</tr>
+						<tr>
+							<td>会议室名称：</td>
+							<td>
+								<input id="capacity" type="text" value="第一会议室" maxlength="20"/>
+							</td>
+						</tr>
+						<tr>
+							<td>最多容纳人数</td>
+							<td>
+								<input type="text" id="roomcapacity" value="15"/>
+							</td>
+						</tr>
+						<tr>
+							<td>当前状态：</td>
+							<td>
+								<input type="radio" id="status" name="status" checked="checked" value="1"/>启用
+								<input type="radio" id="stauts" name="status" value="0"/>停用
+								<input type="radio" id="status" name="status" value="-1"/>删除
+							</td>
+						</tr>
+						<tr>
+							<td>备注：</td>
+							<td>
+								<textarea id="description" name="description" maxlength="200" rows="5" cols="60">本会议室配备投影、幕布、音响设备等</textarea>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2" class="command">
+								<input type="submit" value="确认修改" class="clickbutton"/>
+								<input type="button" value="返回" class="clickbutton" onclick="window.history.back()"/>
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</form>
+		</div>
+	</body>
+</html>

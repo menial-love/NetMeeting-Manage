@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/static/style/common03.css"/>
+		<script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+	</head>
+	<body>
+		<div class="page-content">
+			<div class="content-nav">
+				会议预定>搜索会议
+			</div>
+			<form>
+				<fieldset>
+					<legend style="text-align: center;">搜索会议</legend>
+					<table class="formtable">
+						<tr>
+							<td>会议名称：</td>
+							<td><input type="text" id="meetingName" name="meetingName" maxlength="20"></td>
+							<td>会议室名称：</td>
+							<td><input type="text" id="roomName" name="roomName" maxlength="20"></td>
+							<td>预定者姓名：</td>
+							<td><input type="text" id="reserverName" name="reserverName" maxlength="20"></td>
+						</tr>
+						<tr>
+							<td>预定日期：</td>
+							<td colspan="5">
+								从&nbsp;<input type="datetime-local" id="reserverfromdate" name="reserverfromdate"
+								value=""/>
+								到&nbsp;<input type="datetime-local" id="reservertodate" name="reservertodate"
+								value=""/>
+							</td>
+						</tr>
+						<tr>
+							<td>会议日期：</td>
+							<td colspan="5">
+								从&nbsp;<input type="datetime-local" id="meetingfromdate" name="meetingfromdate"
+											  value=""/>
+								到&nbsp;<input type="datetime-local" id="meetingtodate" name="meetingtodate"
+											  value=""/>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="6" class="command">
+								<button class="btn" id="query" type="button">查询</button>
+								<button class="btn" id="res" type="submit" style="margin-left: 5px">重置</button>
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</form>
+			<div>
+				<h2 style="text-align: center; color: black;">查询结果</h2>
+				<div class="pager-header">
+					<div class="header-info">
+						共<span class="info-number" id="text1"></span>条结果，
+						分成<span class="info-number" id="text2"></span>页显示，
+						当前第<span class="info-number" id="text3"></span>页
+					</div>
+					<div class="header-nav">
+						<button class="btn" id="index" type="button">首页</button>
+						<button class="btn" id="prev" type="button" style="margin-left: 5px">上一页</button>
+						<button class="btn" id="next" type="button" style="margin-left: 5px">下一页</button>
+						<button class="btn" id="end" type="button" style="margin-left: 5px">末页</button>
+						跳转到<input type="text" id="pagenum" class="nav-number"/>页
+						<button class="btn" id="turn" type="button">跳转</button>
+					</div>
+				</div>
+			</div>
+			<table class="listtable">
+				<tr class="listheader">
+					<th>会议名称</th>
+					<th>会议室名称</th>
+					<th>会议开始时间</th>
+					<th>会议结束时间</th>
+					<th>会议预定时间</th>
+					<th>预定者姓名</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+
+		<script>
+			var currentPage = 1;
+			var totalPage = 1;
+			var totalNum = 0;
+			var outcome = {};
+			$(document).ready(function () {
+				var timeFormatSeconds = function(time) {
+					var d = time ? new Date(time) : new Date();
+					var year = d.getFullYear();
+					var month = d.getMonth() + 1;
+					var day = d.getDate();
+					var hours = d.getHours();
+					var min = d.getMinutes();
+					var seconds = d.getSeconds();
+
+					if (month < 10) month = '0' + month;
+					if (day < 10) day = '0' + day;
+					if (hours < 0) hours = '0' + hours;
+					if (min < 10) min = '0' + min;
+					if (seconds < 10) seconds = '0' + seconds;
+
+					return (year + '-' + month + '-' + day + ' ' + hours + ':' + min + ':' + seconds);
+				}
+				// 点击查询时,先获取前端输入的查询条件
+				$("#query").click(function () {
+					currentPage = 1; //只要点击查询当前页即会被置为1
+
+					var MeetingName = $("#meetingName").val();  // 会议名称
+					var RoomName = $("#roomName").val();   // 会议室名称
+					var ReserverName = $("#reserverName").val();  // 预定者姓名
+					var ReserveTimeStart = $("#reserverfromdate").val();  // 预定时间查询条件起始
+					var ReserveTimeEnd = $("#reservertodate").val();  // 预定时间查询条件结束
+					var MeetingStart = $("#meetingfromdate").val();
+					var MeetingEnd = $("#meetingtodate").val();
+
+					var param = {};
+					if(MeetingName !== "") {
+						param["meetingName"] = MeetingName;
+					}
+					if(RoomName !== "") {
+						param["roomName"] = RoomName;
+					}
+					if(ReserverName !== "") {
+						param["reserverName"] = ReserverName;
+					}
+					if(ReserveTimeStart !== "") {
+						ReserveTimeStart = timeFormatSeconds(ReserveTimeStart);
+						param["reserveTimeStart"] = ReserveTimeStart;
+					}
+					if(ReserveTimeEnd !== "") {
+						ReserveTimeEnd = timeFormatSeconds(ReserveTimeEnd);
+						param["reserveTimeEnd"] = ReserveTimeEnd;
+					}
+					if(MeetingStart !== "") {
+						MeetingStart = timeFormatSeconds(MeetingStart);
+						param["meetingStart"] = MeetingStart;
+					}
+					if(MeetingEnd !== "") {
+						MeetingEnd = timeFormatSeconds(MeetingEnd);
+						param["meetingEnd"] = timeFormatSeconds(MeetingEnd);
+					}
+					param = JSON.stringify(param);
+
+					$.ajax({
+						cache: false,
+						type: "POST",
+						url: "/query/meeting/outcome",
+						data: param,
+						dataType: "json",
+						contentType: "application/json",
+						async: true,
+						success: function (data) {
+							$(".listtable tr:not(:first)").html("");  // 首先清除表中内容
+							totalNum = data.length;
+							// 点击查询后始终显示查询结果第一页的数据，一页显示3条数据
+							if(totalNum % 3 === 0) {
+								totalPage = totalNum / 3;
+							} else {
+								// totalPage = Math.floor(totalNum / 3) + 1;
+								totalPage = parseInt(totalNum / 3) + 1;
+							}
+							outcome = data;  // 结果赋值
+							$("#text1").text(totalNum);
+							$("#text2").text(totalPage);
+							$("#text3").text("1");
+							// 当前只显示第一页数据，因此显示outcome前3条数据，不足3条显示所有
+							if(outcome.length <= 3) {
+								for(var i = 0;i < outcome.length;i++) {
+									s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+											outcome[i].roomName + "</td><td>" +
+											outcome[i].beginTime + "</td><td>" +
+											outcome[i].endTime + "</td><td>" +
+											outcome[i].reserveTime + "</td><td>" +
+											outcome[i].reserverName + "</td><td>" +
+											`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+											"</td></tr>";
+									$(".listtable").append(s);
+								}
+							} else {
+								for(var i = 0;i < 3;i++) {
+									s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+											outcome[i].roomName + "</td><td>" +
+											outcome[i].beginTime + "</td><td>" +
+											outcome[i].endTime + "</td><td>" +
+											outcome[i].reserveTime + "</td><td>" +
+											outcome[i].reserverName + "</td><td>" +
+											`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+											"</td></tr>";
+									$(".listtable").append(s);
+								}
+							}
+						}
+					})
+				});
+				// 上一页
+				$("#prev").click(function () {
+					if(currentPage === 1) {
+						// 如果当前页是第一页则不做处理
+						return false;
+					} else {
+						currentPage = currentPage - 1;
+						$("#text3").text(currentPage);
+						$(".listtable tr:not(:first)").html("");
+						// 分页
+						if(currentPage === totalPage) {
+							for(var i = (currentPage-1)*3; i < totalNum;i++){
+								s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+										outcome[i].roomName + "</td><td>" +
+										outcome[i].beginTime + "</td><td>" +
+										outcome[i].endTime + "</td><td>" +
+										outcome[i].reserveTime + "</td><td>" +
+										outcome[i].reserverName + "</td><td>" +
+										`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+										"</td></tr>";
+								$(".listtable").append(s);
+							}
+						} else if(currentPage === 1 && totalNum <= 3){
+							for(var i = 0;i < totalNum;i++){
+								s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+										outcome[i].roomName + "</td><td>" +
+										outcome[i].beginTime + "</td><td>" +
+										outcome[i].endTime + "</td><td>" +
+										outcome[i].reserveTime + "</td><td>" +
+										outcome[i].reserverName + "</td><td>" +
+										`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+										"</td></tr>";
+								$(".listtable").append(s);
+							}
+						} else {
+							for(var i = (currentPage-1)*3;i < (currentPage-1)*3 + 3;i++) {
+								s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+										outcome[i].roomName + "</td><td>" +
+										outcome[i].beginTime + "</td><td>" +
+										outcome[i].endTime + "</td><td>" +
+										outcome[i].reserveTime + "</td><td>" +
+										outcome[i].reserverName + "</td><td>" +
+										`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+										"</td></tr>";
+								$(".listtable").append(s);
+							}
+						}
+					}
+				})
+				// 下一页
+				$("#next").click(function () {
+					if(currentPage === totalPage) {
+						// 如果当前页是最后一页则不做处理
+						return false;
+					} else {
+						currentPage = currentPage + 1;
+						$("#text3").text(currentPage);
+						$(".listtable tr:not(:first)").html("");
+						// 分页
+						if(currentPage === totalPage) {
+							for(var i = (currentPage-1)*3; i < totalNum;i++){
+								s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+										outcome[i].roomName + "</td><td>" +
+										outcome[i].beginTime + "</td><td>" +
+										outcome[i].endTime + "</td><td>" +
+										outcome[i].reserveTime + "</td><td>" +
+										outcome[i].reserverName + "</td><td>" +
+										`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+										"</td></tr>";
+								$(".listtable").append(s);
+							}
+						} else if(currentPage === 1 && totalNum <= 3){
+							for(var i = 0;i < totalNum;i++){
+								s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+										outcome[i].roomName + "</td><td>" +
+										outcome[i].beginTime + "</td><td>" +
+										outcome[i].endTime + "</td><td>" +
+										outcome[i].reserveTime + "</td><td>" +
+										outcome[i].reserverName + "</td><td>" +
+										`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+										"</td></tr>";
+								$(".listtable").append(s);
+							}
+						} else {
+							for(var i = (currentPage-1)*3;i < (currentPage-1)*3 + 3;i++) {
+								s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+										outcome[i].roomName + "</td><td>" +
+										outcome[i].beginTime + "</td><td>" +
+										outcome[i].endTime + "</td><td>" +
+										outcome[i].reserveTime + "</td><td>" +
+										outcome[i].reserverName + "</td><td>" +
+										`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+										"</td></tr>";
+								$(".listtable").append(s);
+							}
+						}
+					}
+				})
+				// 跳转到首页
+				$("#index").click(function () {
+					currentPage = 1;
+					$("#text3").text(currentPage);
+					$(".listtable tr:not(:first)").html("");
+					if(outcome.length <= 3) {
+						for(var i = 0;i < outcome.length;i++) {
+							s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+									outcome[i].roomName + "</td><td>" +
+									outcome[i].beginTime + "</td><td>" +
+									outcome[i].endTime + "</td><td>" +
+									outcome[i].reserveTime + "</td><td>" +
+									outcome[i].reserverName + "</td><td>" +
+									`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+									"</td></tr>";
+							$(".listtable").append(s);
+						}
+					} else {
+						for(var i = 0;i < 3;i++) {
+							s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+									outcome[i].roomName + "</td><td>" +
+									outcome[i].beginTime + "</td><td>" +
+									outcome[i].endTime + "</td><td>" +
+									outcome[i].reserveTime + "</td><td>" +
+									outcome[i].reserverName + "</td><td>" +
+									`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+									"</td></tr>";
+							$(".listtable").append(s);
+						}
+					}
+				})
+				//
+				$("#end").click(function () {
+					currentPage = totalPage;
+					$("#text3").text(currentPage);
+					$(".listtable tr:not(:first)").html("");
+					for(var i = (currentPage-1)*3; i < totalNum;i++){
+						s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+								outcome[i].roomName + "</td><td>" +
+								outcome[i].beginTime + "</td><td>" +
+								outcome[i].endTime + "</td><td>" +
+								outcome[i].reserveTime + "</td><td>" +
+								outcome[i].reserverName + "</td><td>" +
+								`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+								"</td></tr>";
+						$(".listtable").append(s);
+					}
+				})
+				$("#turn").click(function () {
+					page = $("#pagenum").val();
+					currentPage = parseInt(page);
+					$("#text3").text(currentPage);
+					$(".listtable tr:not(:first)").html("");
+					if(currentPage === totalPage) {
+						for(var i = (currentPage-1)*3; i < totalNum;i++){
+							s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+									outcome[i].roomName + "</td><td>" +
+									outcome[i].beginTime + "</td><td>" +
+									outcome[i].endTime + "</td><td>" +
+									outcome[i].reserveTime + "</td><td>" +
+									outcome[i].reserverName + "</td><td>" +
+									`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+									"</td></tr>";
+							$(".listtable").append(s);
+						}
+					} else if(currentPage === 1 && totalNum <= 3){
+						for(var i = 0;i < totalNum;i++){
+							s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+									outcome[i].roomName + "</td><td>" +
+									outcome[i].beginTime + "</td><td>" +
+									outcome[i].endTime + "</td><td>" +
+									outcome[i].reserveTime + "</td><td>" +
+									outcome[i].reserverName + "</td><td>" +
+									`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+									"</td></tr>";
+							$(".listtable").append(s);
+						}
+					} else {
+						for(var i = (currentPage-1)*3;i < (currentPage-1)*3 + 3;i++) {
+							s = "<tr><td>" + outcome[i].meetingName + "</td><td>" +
+									outcome[i].roomName + "</td><td>" +
+									outcome[i].beginTime + "</td><td>" +
+									outcome[i].endTime + "</td><td>" +
+									outcome[i].reserveTime + "</td><td>" +
+									outcome[i].reserverName + "</td><td>" +
+									`<a class=clickbutton href=meetingdetails.html?mid=${outcome[i].meetingId}>查看详情</a>` +
+									"</td></tr>";
+							$(".listtable").append(s);
+						}
+					}
+				})
+			})
+		</script>
+	</body>
+</html>

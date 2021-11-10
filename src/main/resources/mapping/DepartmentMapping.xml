@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.meeting.netmeeting.mapper.DepartmentMapper" >
+    <resultMap id="BaseResultMap" type="com.meeting.netmeeting.entity.Department" >
+        <id column="DepartmentId" property="departmentId" jdbcType="INTEGER" />
+        <result column="DepartmentName" property="departmentName" jdbcType="VARCHAR" />
+        <result column="Remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        DepartmentId, DepartmentName, Remark
+    </sql>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from department
+    </select>
+    <select id="SelectDepartmentIdByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select DepartmentId
+        from department
+        where DepartmentName = #{DepartmentName}
+    </select>
+</mapper>

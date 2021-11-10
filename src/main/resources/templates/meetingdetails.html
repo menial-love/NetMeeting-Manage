@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/static/style/common03.css"/>
+		<script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+	</head>
+	<body>
+		<div class="page-content">
+			<div class="content-nav">
+				会议预定>修改会议预定
+			</div>
+			<form>
+				<fieldset>
+					<legend style="text-align: center">会议信息</legend>
+					<table class="formtable">
+						<tr>
+							<td>会议名称：</td>
+							<td><span id="meetingName"></span></td>
+						</tr>
+						<tr>
+							<td>预计参加人数：</td>
+							<td><span id="num"></span></td>
+						</tr>
+						<tr>
+							<td>预计开始时间：</td>
+							<td><span id="beginTime"></span></td>
+						</tr>
+						<tr>
+							<td>预计结束时间：</td>
+							<td><span id="endTime"></span></td>
+						</tr>
+						<tr>
+							<td>会议说明：</td>
+							<td>
+								<textarea id="description" rows="5" readonly="readonly">
+								</textarea>
+							</td>
+						</tr>
+						<tr>
+							<td>参会人员：</td>
+							<td>
+								<table class="listtable">
+									<tr class="listheader">
+										<th>姓名</th>
+										<th>联系电话</th>
+										<th>电子邮件</th>
+									</tr>
+								</table>
+							</td>
+							<td><a id="download" href="#">下载参会人员名单</a></td>
+						</tr>
+						<tr>
+							<td class="command" colspan="2">
+								<input type="button" class="clickbutton" value="返回" onclick="window.history.back()"/>
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</form>
+		</div>
+		<script>
+			$(document).ready(function () {
+				// 查询会议详细信息
+				var meetingId = location.href.split("=")[1]; // 获取url参数中的会议id
+				$("#download")[0].href = `/download/workHoursExcel/${meetingId}`
+				$.ajax({
+					cache: false,
+					type: 'GET',
+					url: "/query/meetingdetails/" + meetingId,
+					async: true,
+					success: function (data) {
+						$("#meetingName").text(data.meetingName);
+						$("#num").text(data.numOfParticipants);
+						$("#beginTime").text(data.beginTime);
+						$("#endTime").text(data.endTime);
+						$("#description").val(data.description);
+					}
+				})
+				$.ajax({
+					cache: false,
+					type: "GET",
+					url: "/query/meetingparticipant/" + meetingId,
+					async: true,
+					success: function (data) {
+						for(var i = 0;i < data.length;i++) {
+							var s = "";
+							s = "<tr><td>" + data[i].employeeName + "</td><td>" +
+								data[i].phone + "</td><td>" + data[i].email +
+								"</td></tr>";
+							$(".listtable").append(s);
+						}
+					}
+				})
+			})
+		</script>
+	</body>
+</html>

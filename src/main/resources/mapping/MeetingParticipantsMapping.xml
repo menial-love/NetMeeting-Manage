@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.meeting.netmeeting.mapper.MeetingParticipantsMapper">
+    <resultMap id="BaseResultMap" type="com.meeting.netmeeting.entity.MeetingParticipants" >
+        <id column="mpId" property="Mpid" jdbcType="INTEGER" />
+        <result column="MeetingId" property="MeetingId" jdbcType="INTEGER" />
+        <result column="ParticipantId" property="PaticipantsId" jdbcType="INTEGER" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        mpId, MeetingId, ParticipantId
+    </sql>
+    <insert id="insert" parameterType="com.meeting.netmeeting.entity.MeetingParticipants">
+        insert into meetingparticipants(MeetingId, ParticipantId)
+        values(#{MeetingId}, #{PaticipantsId})
+    </insert>
+</mapper>

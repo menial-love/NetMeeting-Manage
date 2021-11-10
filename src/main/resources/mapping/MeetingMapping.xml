@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meeting.netmeeting.mapper.MeetingMapper" >
+    <resultMap id="BaseResultMap" type="com.meeting.netmeeting.entity.Meeting" >
+        <id column="MeetingId" property="meetingId" jdbcType="INTEGER" />
+        <result column="MeetingName" property="meetingName" jdbcType="VARCHAR" />
+        <result column="RoomId" property="roomId" jdbcType="INTEGER" />
+        <result column="ReservationistId" property="reservationistId" jdbcType="INTEGER" />
+        <result column="NumOfParticipants" property="numOfParticipants" jdbcType="INTEGER" />
+        <result column="BeginTime" property="beginTime" jdbcType="TIMESTAMP" />
+        <result column="EndTime" property="endTime" jdbcType="TIMESTAMP" />
+        <result column="ReservationTime" property="reservationTime" jdbcType="TIMESTAMP" />
+        <result column="CanceledTime" property="canceledTime" jdbcType="TIMESTAMP" />
+        <result column="MeetingStatus" property="meetingStatus" jdbcType="TIMESTAMP" />
+        <result column="Description" property="description" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="BaseResultMap2" type="com.meeting.netmeeting.entity.Meeting" >
+        <id column="MeetingId" property="meetingId" jdbcType="INTEGER" />
+        <result column="MeetingName" property="meetingName" jdbcType="VARCHAR" />
+        <result column="RoomId" property="roomId" jdbcType="INTEGER" />
+        <result column="ReservationistId" property="reservationistId" jdbcType="INTEGER" />
+        <result column="NumOfParticipants" property="numOfParticipants" jdbcType="INTEGER" />
+        <result column="BeginTime" property="beginTime" jdbcType="TIMESTAMP" />
+        <result column="EndTime" property="endTime" jdbcType="TIMESTAMP" />
+        <result column="ReservationTime" property="reservationTime" jdbcType="TIMESTAMP" />
+        <result column="CanceledTime" property="canceledTime" jdbcType="TIMESTAMP" />
+        <result column="MeetingStatus" property="meetingStatus" jdbcType="INTEGER" />
+        <result column="Description" property="description" jdbcType="VARCHAR" />
+        <association property="employee" javaType="com.meeting.netmeeting.entity.Employee">
+            <id column="ReservationistId" property="employeeId" jdbcType="INTEGER" />
+            <result column="EmployeeName" property="employeeName" jdbcType="VARCHAR" />
+        </association>
+        <association property="meetingroom" javaType="com.meeting.netmeeting.entity.MeetingRoom">
+            <id column="RoomId" property="roomId" jdbcType="INTEGER" />
+            <result column="RoomName" property="roomName" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+    <!--配置resultMap解决列名不能映射问题，将结果映射为MeetingQueryRes对象-->
+    <resultMap id="BaseResultMap3" type="com.meeting.netmeeting.vo.MeetingQueryRes">
+        <id column="MeetingId" property="meetingId" jdbcType="INTEGER" />
+        <result column="MeetingName" property="meetingName" jdbcType="VARCHAR" />
+        <result column="RoomName" property="roomName" jdbcType="VARCHAR" />
+        <result column="BeginTime" property="beginTime" jdbcType="TIMESTAMP" />
+        <result column="EndTime" property="endTime" jdbcType="TIMESTAMP" />
+        <result column="ReservationTime" property="reserveTime" jdbcType="TIMESTAMP" />
+        <result column="EmployeeName" property="reserverName" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        MeetingId, MeetingName, RoomId, ReservationistId, NumOfParticipants, BeginTime, EndTime,
+        ReservationTime, CanceledTime, MeetingStatus, Description
+    </sql>
+    <insert id="insert" parameterType="com.meeting.netmeeting.entity.Meeting">
+        insert into meeting (MeetingName, RoomId, ReservationistId, NumOfParticipants, BeginTime, EndTime,
+                            ReservationTime, MeetingStatus, Description)
+        values(#{meetingName,jdbcType=VARCHAR}, #{roomId}, #{reservationistId},
+               #{numOfParticipants,jdbcType=INTEGER},
+               #{beginTime}, #{endTime},
+               #{reservationTime}, #{meetingStatus}, #{description,jdbcType=VARCHAR})
+    </insert>
+    <select id="SelectMidByMeetingName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select MeetingId
+        from meeting
+        where MeetingName = #{MeetingName}
+    </select>
+    <select id="QueryMeeting" parameterType="com.meeting.netmeeting.vo.QueryMeetingCondition"
+    resultMap="BaseResultMap3">
+        select m.MeetingId,m.MeetingName,mr.RoomName,m.BeginTime,m.EndTime,m.ReservationTime,e.EmployeeName
+        from meeting as m,employee as e,meetingroom as mr
+
+        where mr.RoomId = m.RoomId and e.EmployeeId = m.ReservationistId
+            <!--预定者姓名不为空则查询由预订者预定的所有会议-->
+        <if test="reserverName != null">
+            and e.EmployeeName=#{reserverName,jdbcType=VARCHAR}
+        </if>
+        <!--如果会议名称不为空则需要限定会议名称-->
+        <if test="meetingName != null">
+            and m.MeetingName like "%"#{meetingName,jdbcType=VARCHAR}"%"
+        </if>
+        <if test="roomName != null">
+            and mr.RoomName like "%"#{roomName,jdbcType=VARCHAR}"%"
+        </if>
+        <if test="reserveTimeStart != null and reserveTimeEnd != null">
+            and (ReservationTime between #{reserveTimeStart,jdbcType=VARCHAR} and #{reserveTimeEnd,jdbcType=VARCHAR})
+        </if>
+        <if test="meetingStart != null and meetingEnd != null">
+            and (BeginTime between #{meetingStart,jdbcType=VARCHAR} and #{meetingEnd,jdbcType=VARCHAR})
+        </if>
+    </select>
+    <select id="SelectMeetingDetailsById" parameterType="java.lang.Integer"
+    resultType="com.meeting.netmeeting.vo.MeetingDetails">
+        select MeetingName, NumOfParticipants, BeginTime, EndTime, Description
+        from meeting
+        where MeetingId = #{meetingId,jdbcType=INTEGER}
+    </select>
+    <select id="SelectMeetingParticipantsById" parameterType="java.lang.Integer"
+    resultType="com.meeting.netmeeting.vo.Participants">
+        select EmployeeName, Phone, Email
+        from employee, meetingparticipants
+        where MeetingId = #{meetingId,jdbcType=INTEGER} and ParticipantId = EmployeeId
+    </select>
+</mapper>

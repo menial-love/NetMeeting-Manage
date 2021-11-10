@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.meeting.netmeeting.mapper.EmployeeMapper" >
+    <resultMap id="BaseResultMap" type="com.meeting.netmeeting.entity.Employee" >
+        <id column="EmployeeId" property="employeeId" jdbcType="INTEGER" />
+        <result column="EmployeeName" property="employeeName" jdbcType="VARCHAR" />
+        <result column="UserName" property="username" jdbcType="VARCHAR" />
+        <result column="UserPwd" property="user_pwd" jdbcType="VARCHAR" />
+        <result column="Phone" property="phone" jdbcType="VARCHAR" />
+        <result column="Email" property="email" jdbcType="VARCHAR" />
+        <result column="DepartmentId" property="departmentId" jdbcType="INTEGER" />
+        <result column="Roleid" property="roleId" jdbcType="INTEGER" />
+        <result column="EmployeeStatus" property="employeeStatus" jdbcType="INTEGER" />
+        <result column="Remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        EmployeeId, EmployeeName, UserName, UserPwd, Phone, Email, DepartmentId, Roleid,
+        EmployeeStatus, Remark
+    </sql>
+    <select id="SelectEmployeeByDepartmentId" parameterType="Integer" resultType="com.meeting.netmeeting.entity.Employee">
+        select *
+        FROM employee
+        WHERE DepartmentId = #{departmentId,jdbcType=INTEGER}
+    </select>
+    <select id="SelectEidByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select EmployeeId
+        from employee
+        where EmployeeName = #{eName}
+    </select>
+</mapper>

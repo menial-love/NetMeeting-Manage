@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/static/style/common03.css" />
+		<script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+	</head>
+	<body>
+		<!-- onload当页面加载完成时触发的事件 -->
+		<div class="page-content">
+			<div class="content-nav">会议预定>预定会议</div>
+			<form>
+				<fieldset>
+					<legend style="text-align: center">预定会议</legend>
+					<table class="formtable">
+						<tr>
+							<td>会议名称：</td>
+							<td>
+								<input type="text" id="meetingName" name="meetingName" maxlength="20" />
+							</td>
+						</tr>
+						<tr>
+							<td>预计参加人数：</td>
+							<td>
+								<input type="text" id="numberOfPartner" name="numberOfPartner" />
+							</td>
+						</tr>
+						<tr>
+							<td>预计开始时间：</td>
+							<td>
+								<input type="datetime-local" id="startTime" name="startTime" />
+							</td>
+						</tr>
+						<tr>
+							<td>预计结束时间：</td>
+							<td>
+								<input type="datetime-local" id="endTime" name="endTime" />
+							</td>
+						</tr>
+						<tr>
+							<td>选择会议室：</td>
+							<td>
+								<select id="roomId" name="roomId">
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>会议说明：</td>
+							<td>
+								<textarea id="description" name="description" rows="5"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td>选择参会人员：</td>
+							<td>
+								<div id="divform">
+									<select id="selDepartments">
+									</select>
+									<select id="selEmployees" multiple="multiple">
+									</select>
+								</div>
+								<div id="divoperator">
+									<input type="button" class="clickbutton" id="add" value="&gt;"/>
+									<input type="button" class="clickbutton" id="deduct" value="&lt;"/>
+								</div>
+								<div id="divto">
+									<select id="selSelectedEmployees" multiple="multiple"></select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="command" colspan="2">
+								<button type="button" id="sub" class="btn-block">预定会议</button>
+								<button type="reset" id="res" class="btn-block">重置</button>
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</form>
+		</div>
+		<script>
+			$(document).ready(function () {
+				// 处理前端获取时间字符串中的T
+				var timeFormatSeconds = function(time) {
+					var d = time ? new Date(time) : new Date();
+					var year = d.getFullYear();
+					var month = d.getMonth() + 1;
+					var day = d.getDate();
+					var hours = d.getHours();
+					var min = d.getMinutes();
+					var seconds = d.getSeconds();
+
+					if (month < 10) month = '0' + month;
+					if (day < 10) day = '0' + day;
+					if (hours < 0) hours = '0' + hours;
+					if (min < 10) min = '0' + min;
+					if (seconds < 10) seconds = '0' + seconds;
+
+					return (year + '-' + month + '-' + day + ' ' + hours + ':' + min + ':' + seconds);
+				}
+				var $r1 = $("#roomId");
+				var $s2 = $("#selDepartments");
+				var rid = 0;   // 会议室id
+				// fix将日期格式化为两位，不足补零
+				var fix = function (num,length) {
+					return ('' + num).length < length ? ((new Array(length + 1)).join('0') + num)
+							.slice(-length) : '' + num;
+				};
+
+				var now = new Date();
+				// 设置起始时间默认值
+				now.setHours(now.getHours());
+				var str = now.getFullYear() + "-" + fix((now.getMonth() + 1), 2) + "-" +
+						fix(now.getDate(), 2) + "T" + fix(now.getHours(), 2) + ":" +
+						fix(now.getMinutes(), 2);
+				$("#startTime").val(str);
+				var r1 = timeFormatSeconds(str);  //这里时间为当前时间，作预定时间
+
+				// 设置结束时间默认值
+				now.setHours(now.getHours()+1);
+				var str = now.getFullYear() + "-" + fix((now.getMonth() + 1), 2) + "-" +
+						fix(now.getDate(), 2) + "T" + fix(now.getHours(), 2) + ":" +
+						fix(now.getMinutes(), 2);
+				$("#endTime").val(str);
+
+				// 从数据库中查询所有会议室
+				$.ajax({
+					cache: false,
+					type: "GET",
+					url: "/queryroom",
+					async: true,
+					success: function (data) {
+						for(var i = 0;i < data.length;i++) {
+							var s = "<option>" + data[i] + "</option>"
+							$r1.append(s);
+						}
+						$("#roomId")[0].selectedIndex = -1; // 设置选择框默认为空
+					}
+				});
+
+				// 从后端将所有部门名称数据取出
+				$.ajax({
+					cache: false,
+					type: "GET",
+					url: "/querydepartment",
+					async: true,
+					success: function (data) {
+						for(var i = 0;i < data.length;i++) {
+							var s = "<option>" + data[i] + "</option>"
+							$s2.append(s);
+						}
+						$s2[0].selectedIndex = -1;
+					}
+				});
+
+				// 当选择部门后更新部门人员列表
+				$("#selDepartments").change(function () {
+					var name = $("#selDepartments option:selected").val();
+					$.ajax({
+						cache: false,
+						type: "GET",
+						url: "/queryallename/" + name,
+						async: true,
+						success(data) {
+							$("#selEmployees").html("");  // 首先清除之前选项
+							$("#selSelectedEmployees").html(""); //清除被选员工
+							for(var i = 0;i < data.length;i++) {
+								var s = "<option>" + data[i] + "</option>"
+								$("#selEmployees").append(s);
+							}
+						}
+					})
+				});
+
+				// 两个select框的操作
+				$("#add").click(function () {
+					var LeftSelect = $("#selEmployees option:selected");
+					// append方法在被选元素的结尾插入字符串内容"<tr><td>" + "</td></tr>"
+					// appendTo方法在被选元素的结尾插入html元素
+					LeftSelect.clone().appendTo("#selSelectedEmployees"); // 将LeftSelect添加到selSelectedEmployees
+					LeftSelect.remove();
+				});
+				$("#deduct").click(function () {
+					var RightSelect = $("#selSelectedEmployees option:selected");
+					RightSelect.clone().appendTo("#selEmployees");
+					RightSelect.remove();
+				});
+
+				// 选择会议室后获取会议室id
+				$("#roomId").change(function() {
+					var rName = $("#roomId option:selected").val();
+					$.ajax({
+						cache: false,
+						type: "GET",
+						url: "/queryrid/" + rName,
+						async: true,
+						success: function(data) {
+							rid = data;
+						}
+					});
+				});
+
+				// 提交数据
+				$("#sub").click(function () {
+					var mName = $.trim($("input#meetingName").val());
+					var numOfp = $.trim($("input#numberOfPartner").val());
+					// 检查字段的值
+					if(mName === "") {
+						alert("请填写会议名称!");
+						return false;
+					}
+					if(numOfp === "") {
+						alert("请填写参会人数!");
+						return false;
+					}
+
+					var x = $("#startTime").val();
+					var y = $("#endTime").val();
+
+					var StartTime = new Date();
+					var EndTime = new Date();
+					StartTime.setFullYear(parseInt(x.substring(0, 4)));
+					StartTime.setMonth(parseInt(x.substring(5, 7)) - 1);
+					StartTime.setDate(parseInt(x.substring(8, 10)));
+					StartTime.setHours(parseInt(x.substring(11, 13)));
+					StartTime.setMinutes(parseInt(x.substring(14, 16)));
+					EndTime.setFullYear(parseInt(y.substring(0, 4)));
+					EndTime.setMonth(parseInt(y.substring(5, 7)) - 1);
+					EndTime.setDate(parseInt(y.substring(8, 10)));
+					EndTime.setHours(parseInt(y.substring(11, 13)));
+					EndTime.setMinutes(parseInt(y.substring(14, 16)));
+					//如果会议结束时间早于其实时间需要报错返回
+					if(EndTime.getTime() < StartTime.getTime()) {
+						alert("请填写正确的时间!");
+						return false;
+					}
+
+					var des = $("#description").val();  // 描述
+					var names = [];   // 参会人员的姓名
+					var i = 0;
+					// 获取参会人员信息
+					$("#selSelectedEmployees option").each(function () {
+						names[i] = $(this).val();
+						i++;
+					});
+
+					var x1 = timeFormatSeconds(x);   // 格式化字符串转化为合适的格式将T去掉
+					var y1 = timeFormatSeconds(y);
+
+					// 对象键名对应meeting实体类属性名，后端@RequestBody Meeting meeting自动创建对象
+					var formData = {
+						"meetingName": mName,
+						"roomId": rid,
+						"reservationistId": 1,
+						"numOfParticipants": numOfp,
+						"beginTime": x1,
+						"endTime": y1,
+						"reservationTime": r1,
+						"meetingStatus": 1,
+						"des": des,
+					}
+					var formData = JSON.stringify(formData);
+
+					// 将会议信息插入到表meeting
+					$.ajax({
+						cache: false,
+						type: "POST",
+						url: "/bookmeeting",
+						data: formData,
+						dataType: "json",
+						async: false,
+						contentType: "application/json",
+						success: function(data) {
+							alert(data.message);
+						}
+					});
+
+					// 参会人员信息插入到表 meetingparticipant
+					var parm = {
+						"name": names,
+					}
+					parm = JSON.stringify(parm);
+
+					$.ajax({
+						cache: false,
+						type: "POST",
+						url: "/insert/meetingpartipants/" + mName,
+						data: parm,
+						dataType: "json",
+						contentType: "application/json",
+						async: true,
+						success: function (data) {
+							location.reload();
+						}
+					})
+				});
+			});
+		</script>
+	</body>
+</html>

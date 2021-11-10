@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--给浏览器看的 说明当前的文档是一个html文档 html5.0-->
+<html>
+	<head>
+		<meta charset="utf-8">
+		<!-- GBK简体和繁体中文 -->
+		<!-- 万国码 -->
+		<title>login</title>
+		<link href="style/common.css" rel="stylesheet" type="text/css"/>
+	</head>
+	<body>
+		<!-- <font color="cadetblue" size="5">netMeeting会议管理系统</font> -->
+		<!-- css样式 引入的方式有三种
+		1.内联样式
+		2.外联样式
+		3.嵌入样式 优先级最高 -->
+		
+		<div class="page-content">
+			<!-- <div class="content-nav">登录</div> -->
+			<form action="adminindex.html" method="get">
+				<fieldset>
+					<legend align="center">登录</legend>
+					<tr>
+						<td>提示信息：</td>
+						<td><font style="color: red;"></font></td>
+					</tr>
+					<table class="formtable">
+						<tr>
+							<td><label>用户名</label></td>
+							<td><input type="text" id="accountname" name="username"></td>
+						</tr>
+						<tr>
+							<td><label>密码</label></td>
+							<td><input type="password" id="password" name="password"></td>
+						</tr>
+						
+						<tr>
+							<!-- <td></td>
+							<td>
+							<select id="timelength" name="timelength">
+							<option value="0" selected="selected">每次都需要登录</option>
+			
+							<option value="10">10天</option>
+							<option value="30">30天</option>
+							</select>
+							</td> -->
+							<!-- selected="selected"下拉列表默认显示的项 -->
+							<td colspan="2" align="center">
+								<input type="radio" name="timeLegth" checked="" value="0" />每次登录
+								<input type="radio" name="timeLegth" value="10" />10天免登录
+								<input type="radio" name="timeLegth" value="30" />30天免登录
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2" class="command" >
+							<input type="submit" value="立即登录" class="clickbutton" />
+							<!-- <input type="reset" class="clickbutton"/>
+							<input type="button" class="clickbutton" value="注册"/> -->
+							</td>
+						</tr>
+					</table>
+					<span class="left-pwd"><a href="">忘记密码</a></span>
+					<span class="right-reg"><a href="">立即注册</a></span>
+				</fieldset>	
+			</form>
+			
+		</div>
+	</body>
+</html>
